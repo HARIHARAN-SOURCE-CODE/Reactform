@@ -1,70 +1,240 @@
-# Getting Started with Create React App
+import React, { useState } from "react";
+import "bootstrap/dist/css/bootstrap.min.css";
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+function App() {
+ 
+  const [formData, setFormData] = useState({
+    username: "",
+    fullName: "",
+    email: "",
+    phone: "",
+    education: "",
+    languages: "",
+    experience: "",
+  });
 
-## Available Scripts
 
-In the project directory, you can run:
+  const [users, setUsers] = useState([]);
 
-### `npm start`
+  const [editIndex, setEditIndex] = useState(null);
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+  
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
 
-### `npm test`
+  const handleSubmit = (e) => {
+    e.preventDefault();
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+  
+    for (let key in formData) {
+      if (!formData[key]) {
+        alert(`Please fill out the ${key} field`);
+        return;
+      }
+    }
 
-### `npm run build`
+    if (formData.username.length < 3) {
+      alert("Username must be at least 3 characters long");
+      return;
+    }
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(formData.email)) {
+      alert("Please enter a valid email address");
+      return;
+    }
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+  
+    const phoneRegex = /^[0-9]{10}$/;
+    if (!phoneRegex.test(formData.phone)) {
+      alert("Phone number must be 10 digits only");
+      return;
+    }
 
-### `npm run eject`
+    if (editIndex !== null) {
+ 
+      const updatedUsers = [...users];
+      updatedUsers[editIndex] = formData;
+      setUsers(updatedUsers);
+      setEditIndex(null);
+    } else {
+ 
+      setUsers([...users, formData]);
+    }
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+  
+    setFormData({
+      username: "",
+      fullName: "",
+      email: "",
+      phone: "",
+      education: "",
+      languages: "",
+      experience: "",
+    });
+  };
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+  const handleEdit = (index) => {
+    setFormData(users[index]);
+    setEditIndex(index);
+  };
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+  const handleDelete = (index) => {
+    const updatedUsers = users.filter((_, i) => i !== index);
+    setUsers(updatedUsers);
+  };
 
-## Learn More
+  return (
+    <div className="container mt-4">
+      <h1 className="mb-4 text-center">Registration Form</h1>
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+   
+      <form className="row g-3" onSubmit={handleSubmit}>
+        <div className="col-md-6">
+          <label className="form-label">Username</label>
+          <input
+            name="username"
+            value={formData.username}
+            onChange={handleChange}
+            type="text"
+            className="form-control"
+            placeholder="Enter username"
+          />
+        </div>
+        <div className="col-md-6">
+          <label className="form-label">Full Name</label>
+          <input
+            name="fullName"
+            value={formData.fullName}
+            onChange={handleChange}
+            type="text"
+            className="form-control"
+            placeholder="Enter full name"
+          />
+        </div>
+        <div className="col-md-6">
+          <label className="form-label">Email</label>
+          <input
+            name="email"
+            value={formData.email}
+            onChange={handleChange}
+            type="email"
+            className="form-control"
+            placeholder="Enter email"
+          />
+        </div>
+        <div className="col-md-6">
+          <label className="form-label">Phone</label>
+          <input
+            name="phone"
+            value={formData.phone}
+            onChange={handleChange}
+            type="text"
+            className="form-control"
+            placeholder="Enter phone (10 digits)"
+          />
+        </div>
+        <div className="col-md-6">
+          <label className="form-label">Education</label>
+          <input
+            name="education"
+            value={formData.education}
+            onChange={handleChange}
+            type="text"
+            className="form-control"
+            placeholder="Education background"
+          />
+        </div>
+        <div className="col-md-6">
+          <label className="form-label">Languages</label>
+          <input
+            name="languages"
+            value={formData.languages}
+            onChange={handleChange}
+            type="text"
+            className="form-control"
+            placeholder="Preferred coding languages"
+          />
+        </div>
+        <div className="col-md-6">
+          <label className="form-label">Experience</label>
+          <select
+            name="experience"
+            value={formData.experience}
+            onChange={handleChange}
+            className="form-control"
+          >
+            <option value="">Select</option>
+            <option value="beginner">Beginner</option>
+            <option value="intermediate">Intermediate</option>
+            <option value="advanced">Advanced</option>
+          </select>
+        </div>
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+        <div className="col-12">
+          <button type="submit" className="btn btn-primary">
+            {editIndex !== null ? "Update" : "Register"}
+          </button>
+        </div>
+      </form>
 
-### Code Splitting
+  
+      <div className="mt-5">
+        <h2 className="mb-3">Registered Users</h2>
+        {users.length === 0 ? (
+          <p>No users registered yet.</p>
+        ) : (
+          <div className="table-responsive">
+            <table className="table table-bordered table-striped">
+              <thead className="table-dark">
+                <tr>
+                  <th>Username</th>
+                  <th>Full Name</th>
+                  <th>Email</th>
+                  <th>Phone</th>
+                  <th>Education</th>
+                  <th>Languages</th>
+                  <th>Experience</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {users.map((user, index) => (
+                  <tr key={index}>
+                    <td>{user.username}</td>
+                    <td>{user.fullName}</td>
+                    <td>{user.email}</td>
+                    <td>{user.phone}</td>
+                    <td>{user.education}</td>
+                    <td>{user.languages}</td>
+                    <td>{user.experience}</td>
+                    <td>
+                      <button
+                        className="btn btn-sm btn-warning me-2"
+                        onClick={() => handleEdit(index)}
+                      >
+                        Edit
+                      </button>
+                      <button
+                        className="btn btn-sm btn-danger"
+                        onClick={() => handleDelete(index)}
+                      >
+                        Delete
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+export default App;
